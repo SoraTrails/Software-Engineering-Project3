@@ -1,11 +1,11 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<Windows.h>
-#include<math.h>
 #include<time.h>
+#include"resource.h"
 
 #define M 50
-#define BLOCKNUM 3
+#define BLOCKNUM 8
 #define STEPSIZE 500	//(-STEPSIZE, STEPSIZE)
 #define CORENUM 4
 
@@ -59,50 +59,50 @@ void produceBlock()
 {
 	//srand(time(NULL));
 	//test1:
-	blocks2[0].x = TRANS(0.9);
-	blocks2[0].y = TRANS(0.9);
-	blocks2[1].x = TRANS(-0.9);
-	blocks2[1].y = TRANS(0.9);
-	blocks2[2].x = TRANS(0.9);
-	blocks2[2].y = TRANS(-0.9);
+	//blocks2[0].x = TRANS(0.9);
+	//blocks2[0].y = TRANS(0.9);
+	//blocks2[1].x = TRANS(-0.9);
+	//blocks2[1].y = TRANS(0.9);
+	//blocks2[2].x = TRANS(0.9);
+	//blocks2[2].y = TRANS(-0.9);
 	//test2:
 	//blocks2[0].x = 0;
 	//blocks2[0].y = 0;
-	//blocks2[1].x = -0.9;
-	//blocks2[1].y = 0.9;
-	//blocks2[2].x = 0.9;
-	//blocks2[2].y = -0.9;
+	//blocks2[1].x = TRANS(-0.8);
+	//blocks2[1].y = TRANS(0.5);
+	//blocks2[2].x = TRANS(0.5);
+	//blocks2[2].y = TRANS(-0.4);
 
-	//for (int i = 0;i < BLOCKNUM;i++)
-	//{
-	//	blocks2[i].x = (double)((double)rand() / RAND_MAX) * 2 - 1;
-	//	blocks2[i].y = (double)((double)rand() / RAND_MAX) * 2 - 1;
-	//	blocks3[i].x = (double)((double)rand() / RAND_MAX) * 2 - 1;
-	//	blocks3[i].y = (double)((double)rand() / RAND_MAX) * 2 - 1;
-	//	blocks3[i].z = (double)((double)rand() / RAND_MAX) * 2 - 1;
-	//}
+	for (int i = 0;i < BLOCKNUM;i++)
+	{
+		blocks2[i].x = rand() % (2 * STEPSIZE - 1) - STEPSIZE + 1;
+		blocks2[i].y = rand() % (2 * STEPSIZE - 1) - STEPSIZE + 1;
+		/*blocks3[i].x = (double)((double)rand() / RAND_MAX) * 2 - 1;
+		blocks3[i].y = (double)((double)rand() / RAND_MAX) * 2 - 1;
+		blocks3[i].z = (double)((double)rand() / RAND_MAX) * 2 - 1;*/
+	}
 }
 
 bool ifOverlap2(int x, int y, int r)
 {
 	for (int i = 0;i < BLOCKNUM;i++)
-		if (r > sqrt((blocks2[i].x - x)*(blocks2[i].x - x) + (blocks2[i].y - y)*(blocks2[i].y - y)))
+		if (r * r > (blocks2[i].x - x)*(blocks2[i].x - x) + (blocks2[i].y - y)*(blocks2[i].y - y))
 			return false;
 
-  	EnterCriticalSection(&mutex2);
+//  	EnterCriticalSection(&mutex2);
 
 	CIRCLE *temp = circlesHead->next;
 	while (temp != NULL)
 	{
-		if (temp->r + r > sqrt((temp->x - x)*(temp->x - x) + (temp->y - y)*(temp->y - y)))
+		if ((temp->r + r) * (temp->r + r) > (temp->x - x)*(temp->x - x) + (temp->y - y)*(temp->y - y))
 		{
-			LeaveCriticalSection(&mutex2);
+	//		LeaveCriticalSection(&mutex2);
 			return false;
 		}
 		temp = temp->next;
 	}
 
-	LeaveCriticalSection(&mutex2);
+	//LeaveCriticalSection(&mutex2);
 	return true;
 }
 bool ifOverlap3(double x, double y, double z, double r)
@@ -112,13 +112,13 @@ bool ifOverlap3(double x, double y, double z, double r)
 	BALL *temp = ballsHead->next;
 
 	for (int i = 0;i < BLOCKNUM;i++)
-		if (r > sqrt((blocks3[i].x - x)*(blocks3[i].x - x) + (blocks3[i].y - y)*(blocks3[i].y - y) +
-			(blocks3[i].z - z)*(blocks3[i].z - z)))
+		if (r * r > (blocks3[i].x - x)*(blocks3[i].x - x) + (blocks3[i].y - y)*(blocks3[i].y - y) +
+			(blocks3[i].z - z)*(blocks3[i].z - z))
 			return false;
 
 	while (temp != NULL)
 	{
-		if (temp->r + r > sqrt((temp->x - x)*(temp->x - x) + (temp->y - y)*(temp->y - y) + (temp->z - z)*(temp->z - z)))
+		if ((temp->r + r) * (temp->r + r) > (temp->x - x)*(temp->x - x) + (temp->y - y)*(temp->y - y) + (temp->z - z)*(temp->z - z))
 			return false;
 		temp = temp->next;
 	}
@@ -130,7 +130,7 @@ DWORD WINAPI max2dThread(LPVOID lpParam)
 {
 	PPRARM p = (PPRARM)lpParam;
 	int *presentNum = p->presentNum;
-	int quadrant = p->quadrant;///???
+	int quadrant = p->quadrant;
 	int r = p->r;
 
 	int lBoder, rBoder, uBoder, dBoder;
@@ -141,12 +141,12 @@ DWORD WINAPI max2dThread(LPVOID lpParam)
 	}
 	else {
 		uBoder = 0;
-		dBoder = (-1)*STEPSIZE + r;
+		dBoder = (-1)*STEPSIZE + r + 1;
 	}
 
 	if (quadrant >= 2 && quadrant <= 3)	{
 		rBoder = 0;
-		lBoder = (-1)*STEPSIZE + r;
+		lBoder = (-1)*STEPSIZE + r + 1;
 	}
 	else {
 		rBoder = STEPSIZE - r;
@@ -172,10 +172,34 @@ DWORD WINAPI max2dThread(LPVOID lpParam)
 
 				LeaveCriticalSection(&mutex2);
 				(*presentNum)++;
-				return 1;
+				if (r < STEPSIZE / 2)
+					y = y + 2 * r - 1;
+				else
+					return 1;
 			}
 		}
 	return 0;
+}
+
+int FindMaxR() {
+	int r = STEPSIZE;
+	int x, y;
+	bool flag = true;
+	r++;
+	while (flag) {
+		r--;
+		x = -STEPSIZE + r;
+		y = -STEPSIZE + r;
+		flag = false;
+		for (int i = 0; i <= BLOCKNUM; i++) {
+			if (r*r > (blocks2[i].x - x)*(blocks2[i].x - x) + (blocks2[i].y - y)*(blocks2[i].y - y))
+			{
+				flag = true;
+				break;
+			}
+		}
+	}
+	return r;
 }
 
 void max2d()
@@ -193,7 +217,7 @@ void max2d()
 		p[i]->quadrant = i + 1;
 	}
 
-	for (int r = STEPSIZE;r > 0;r--)
+	for (int r = STEPSIZE;/*FindMaxR();*/r > 0;r--)
 	{
 		for (int i = 0;i < CORENUM;i++)   //分四个象限
 		{
@@ -223,7 +247,7 @@ void max2d()
 			return;
 		}
 	}
-}
+  }
 
 void max3d()
 {
@@ -259,6 +283,52 @@ void max3d()
 
 }
 
+BOOL CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) 
+{
+	HDC hdc = GetDC(hDlg);
+	CIRCLE *temp = circlesHead->next;
+	HBRUSH brush;
+	int x, y, r;
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+			Rectangle(hdc, 0, 0, 500, 500);
+			brush = CreateSolidBrush(RGB(0, 255, 0));
+			SelectObject(hdc, brush);
+			while (temp != NULL)
+			{
+				x = (temp->x + STEPSIZE) / (STEPSIZE / 500 * 2);
+				y = (temp->y + STEPSIZE) / (STEPSIZE / 500 * 2);
+				r = temp->r / (STEPSIZE / 500 * 2);
+				Ellipse(hdc, x - r, y + r, x + r, y - r);
+				temp = temp->next;
+			}
+
+			brush = CreateSolidBrush(RGB(255, 0, 0));
+			SelectObject(hdc, brush);
+			for (int i = 0;i < BLOCKNUM;i++)
+			{
+				x = (blocks2[i].x + STEPSIZE) / (STEPSIZE / 500 * 2);
+				y = (blocks2[i].y + STEPSIZE) / (STEPSIZE / 500 * 2);
+				Ellipse(hdc, x - 2, y + 2, x + 2, y - 2);
+			}
+			return TRUE;
+		case IDCANCEL:
+			EndDialog(hDlg, 0);
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
+
+}
+
 int main()
 {
 	circlesHead->next = NULL;
@@ -280,8 +350,10 @@ int main()
 	}
 	printf("sum2(r^2):%lf\n", sum1);
 	printf("time2:%.3f\n", (double)(end2 - start2) / CLOCKS_PER_SEC);
-	system("pause");
 
+	HINSTANCE hModule = GetModuleHandle(NULL);
+	DialogBox(hModule, MAKEINTRESOURCEA(IDD_DIALOG1), NULL, DialogProc);
+	system("pause");
 
 	start3 = clock();
 	max3d();
