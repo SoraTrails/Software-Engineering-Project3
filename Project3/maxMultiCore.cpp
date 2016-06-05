@@ -65,6 +65,7 @@ void produceBlock()
 	//blocks2[2].y = TRANS(-0.5);
 	//blocks2[3].x = TRANS(0);
 	//blocks2[3].y = TRANS(0.5);
+	//
 
 	//test2:
 	blocks2[0].x = 0;
@@ -138,7 +139,7 @@ DWORD WINAPI max2dThread(LPVOID lpParam)
 
 	int lBoder, rBoder, uBoder, dBoder;
 
-	if (quadrant <= 2)	{				//åˆ¤æ–­å„è±¡é™çš„è¾¹ç•Œ
+	if (quadrant <= 2)	{				//ÅÐ¶Ï¸÷ÏóÏÞµÄ±ß½ç
 		uBoder = SIZE - r;
 		dBoder = 0;
 	}
@@ -222,7 +223,7 @@ void max2d()
 
 	for (int r = SIZE;/*FindMaxR()*/r > 0;r--)
 	{
-		for (int i = 0;i < CORENUM;i++)   //åˆ†å››ä¸ªè±¡é™
+		for (int i = 0;i < CORENUM;i++)   //·ÖËÄ¸öÏóÏÞ
 		{
 			p[i]->r = r;
 			hThread[i] = CreateThread(NULL, 0, max2dThread, p[i], 0, NULL);
