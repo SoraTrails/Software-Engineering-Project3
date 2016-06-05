@@ -56,7 +56,26 @@ CRITICAL_SECTION mutex2;
 void produceBlock()
 {
 	srand(time(NULL));
-	
+	//test1:
+	//blocks2[0].x = TRANS(0.5);
+	//blocks2[0].y = TRANS(0);
+	//blocks2[1].x = TRANS(-0.5);
+	//blocks2[1].y = TRANS(0);
+	//blocks2[2].x = TRANS(0);
+	//blocks2[2].y = TRANS(-0.5);
+	//blocks2[3].x = TRANS(0);
+	//blocks2[3].y = TRANS(0.5);
+
+	//test2:
+	blocks2[0].x = 0;
+	blocks2[0].y = 0;
+	blocks2[1].x = TRANS(-0.75);
+	blocks2[1].y = TRANS(0.75);
+	blocks2[2].x = TRANS(0.75);
+	blocks2[2].y = TRANS(-0.75);
+	blocks2[3].x = TRANS(0.75);
+	blocks2[3].y = TRANS(0.75);
+
 	for (int i = 0;i < BLOCKNUM;i++)
 	{
 		blocks2[i].x = rand() % (2 * SIZE - 1) - SIZE + 1;
@@ -119,7 +138,7 @@ DWORD WINAPI max2dThread(LPVOID lpParam)
 
 	int lBoder, rBoder, uBoder, dBoder;
 
-	if (quadrant <= 2)	{				//ÅÐ¶Ï¸÷ÏóÏÞµÄ±ß½ç
+	if (quadrant <= 2)	{				//åˆ¤æ–­å„è±¡é™çš„è¾¹ç•Œ
 		uBoder = SIZE - r;
 		dBoder = 0;
 	}
@@ -203,7 +222,7 @@ void max2d()
 
 	for (int r = SIZE;/*FindMaxR()*/r > 0;r--)
 	{
-		for (int i = 0;i < CORENUM;i++)   //·ÖËÄ¸öÏóÏÞ
+		for (int i = 0;i < CORENUM;i++)   //åˆ†å››ä¸ªè±¡é™
 		{
 			p[i]->r = r;
 			hThread[i] = CreateThread(NULL, 0, max2dThread, p[i], 0, NULL);
